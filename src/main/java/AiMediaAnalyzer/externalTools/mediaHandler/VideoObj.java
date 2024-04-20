@@ -38,8 +38,9 @@ public class VideoObj {
         this.iaImagePath = iaImagePath;
     }
 
-    public VideoObj(String mapImagePath, String iaImagePath) {
+    public VideoObj(String mapImagePath, String iaImagePath, String captions) {
         setIaImagePath(iaImagePath);
         setMapImagePath(mapImagePath);
+        setCaptions(captions);
     }
 }

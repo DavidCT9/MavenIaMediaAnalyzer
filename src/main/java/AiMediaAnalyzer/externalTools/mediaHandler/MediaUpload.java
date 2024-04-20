@@ -5,10 +5,7 @@ import AiMediaAnalyzer.IOtools.IOHandler;
 import com.cloudinary.*;
 import com.cloudinary.utils.ObjectUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -19,22 +16,21 @@ public class MediaUpload {
     public void cloudinaryHandler(MediaObj[] mediaArray) {
 
         try {
-            for (MediaObj mediaFile : mediaArray){
+            for (MediaObj mediaFile : mediaArray) {
 
                 String filePath = mediaFile.getAbsolutePath();
                 String publicId = mediaFile.getDateOriginal();
 
                 mediaFile.setUrl(cloudinaryUpload(filePath, publicId));
-                if (mediaFile.getUrl()!=null){
+                if (mediaFile.getUrl() != null) {
                     inputOutput.showInfo("Upload successful!");
                     inputOutput.showInfo("Public URL: " + mediaFile.getUrl());
                 }
 
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             inputOutput.showInfo("All files couldn't be uploaded, check your media and try again");
         }
-
 
 
     }
@@ -59,7 +55,7 @@ public class MediaUpload {
 
                     uploadResult = cloudinary.uploader().upload(thumbnailImg,
                             ObjectUtils.asMap(
-                                    "public_id", "Thumbnail"+publicId,
+                                    "public_id", "Thumbnail" + publicId,
                                     "resource_type", "image"
                             )
                     );
@@ -84,17 +80,32 @@ public class MediaUpload {
 
 
     private static String getVideoThumbnail(String filePath, String fileName) {
-        String thumbnailFilePath = null;
+        String[] command;
+        command = new String[]{"ffmpeg", "-i", filePath, "-vf", "select='eq(n,0)'",
+                "-vframes", "1", fileName + ".jpg"};
+
+        ProcessBuilder builder = new ProcessBuilder(command);
+        builder.redirectErrorStream(true);
+
         try {
-            Process metadataProcess = Runtime.getRuntime().exec("ffmpeg -i " + filePath + " -vframes 1 " + fileName + ".jpg");
+            Process process = builder.start();
+            InputStream is = process.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
 
-        } catch (IOException e) {
-            System.err.println("Error executing ffmpeg command: " + e.getMessage());
-            e.printStackTrace();
+            String line;
+            while ((line = br.readLine()) != null) {
+                //System.out.println(line);
+            }
+            int exitCode = process.waitFor();
+            System.out.println("Process exited with code: " + exitCode);
+            process.destroy();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        return filePath+".jpg";
-    }
 
+        return fileName+".jpg";
+    }
 
 
 }

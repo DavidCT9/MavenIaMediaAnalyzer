@@ -5,9 +5,11 @@ public class MediaObj {
     private String latitude;
     private String longitude;
     private String dateOriginal="";
-    public String url;
-    public String iaDescription;
-    public boolean isVideo;
+    private String url;
+    private String iaDescription;
+    private String audioPath;
+    private String generatedVideoPath;
+
 
 
     public MediaObj(String absolutePath, String latitude, String longitude, String dateOriginal) {
@@ -15,15 +17,22 @@ public class MediaObj {
         setLatitude(latitude);
         setLongitude(longitude);
         setDateOriginal(dateOriginal);
-        setVideo(false);
     }
 
-    public boolean isVideo() {
-        return isVideo;
+    public String getGeneratedVideoPath() {
+        return generatedVideoPath;
     }
 
-    public void setVideo(boolean video) {
-        isVideo = video;
+    public void setGeneratedVideoPath(String generatedVideo) {
+        this.generatedVideoPath = generatedVideo;
+    }
+
+    public String getAudioPath() {
+        return audioPath;
+    }
+
+    public void setAudioPath(String audioPath) {
+        this.audioPath = audioPath;
     }
 
     public String getIaDescription() {

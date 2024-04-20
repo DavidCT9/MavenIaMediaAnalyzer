@@ -52,7 +52,6 @@ public class MetadataExtractor {
         setFolder(new File(getmediaFolderPath()));
         setMediaFiles(getFolder().listFiles());
         MediaObj[] mediaArray = new MediaObj[getMediaFiles().length];
-        System.out.println(getMediaFiles().length);
 
         int mediaObjCounter=0;
         if (getMediaFiles() != null) {

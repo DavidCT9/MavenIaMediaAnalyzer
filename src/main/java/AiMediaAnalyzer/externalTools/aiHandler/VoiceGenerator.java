@@ -33,6 +33,7 @@ public class VoiceGenerator {
 
                 System.out.println("Waiting " + process.waitFor());
                 process.destroy();
+                mediaObj.setAudioPath(audioName+".mp3");
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }

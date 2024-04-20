@@ -22,7 +22,7 @@ public class MapGenerator {
         String googleApiKey = System.getenv("GOOGLE_API");
         String[] commandPrompt;
 
-        commandPrompt = new String[]{"curl", "-X", "POST", "-H", "Content-Length: 0", "https://maps.googleapis.com/maps/api/staticmap?center=" + location[0] + "&zoom=1&size=400x400&markers=" + location[0] + "&markers=" + location[1] + "&key=" + googleApiKey};
+        commandPrompt = new String[]{"curl", "-X", "POST", "-H", "Content-Length: 0", "https://maps.googleapis.com/maps/api/staticmap?center=" + location[2] + "&zoom=1&size=400x400&markers=" + location[0] + "&markers=" + location[1] + "&key=" + googleApiKey};
 
         final ProcessBuilder builder = new ProcessBuilder();
         Path path = null;
@@ -55,13 +55,15 @@ public class MapGenerator {
         //Sort the MediaObj array depending on the timestamp value that each one has
         Arrays.sort(mediaObjs, Comparator.comparingLong(obj -> Long.parseLong(obj.getDateOriginal())));
 
-        for (MediaObj mediaFile : mediaObjs) {
-            System.out.println(mediaFile.getDateOriginal());
-        }
+//        for (MediaObj mediaFile : mediaObjs) {
+//            System.out.println(mediaFile.getDateOriginal());
+//        }
 
-        String[] location = new String[2];
+        String[] location = new String[3];
         location[0] = formatLocation(mediaObjs[0].getLatitude(), mediaObjs[0].getLongitude());
         location[1] = formatLocation(mediaObjs[mediaObjs.length-1].getLatitude(), mediaObjs[mediaObjs.length-1].getLongitude());
+        location[2] = calculateMidpoint(location[0] , location[1]);
+//        System.out.println(location[2]);
 
         return location;
     }
@@ -93,6 +95,23 @@ public class MapGenerator {
 
         int directionMultiplier = (parts[3].equals("W") || parts[3].equals("S")) ? -1 : 1;
         return decimalDegrees * directionMultiplier;
+    }
+
+    public static String calculateMidpoint(String location1, String location2) {
+        String[] parts1 = location1.split(",");
+        String[] parts2 = location2.split(",");
+
+        double lat1 = Double.parseDouble(parts1[0]);
+        double lon1 = Double.parseDouble(parts1[1]);
+
+        double lat2 = Double.parseDouble(parts2[0]);
+        double lon2 = Double.parseDouble(parts2[1]);
+
+        // Calculating the average latitude and longitude
+        double avgLat = (lat1 + lat2) / 2;
+        double avgLon = (lon1 + lon2) / 2;
+
+        return String.format("%.6f,%.6f", avgLat, avgLon);
     }
 
 
