@@ -9,6 +9,7 @@ public class MediaObj {
     public String iaDescription;
     public boolean isVideo;
 
+
     public MediaObj(String absolutePath, String latitude, String longitude, String dateOriginal) {
         setAbsolutePath(absolutePath);
         setLatitude(latitude);

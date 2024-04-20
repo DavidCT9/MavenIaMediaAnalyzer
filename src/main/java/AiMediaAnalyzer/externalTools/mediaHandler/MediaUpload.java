@@ -5,6 +5,7 @@ import AiMediaAnalyzer.IOtools.IOHandler;
 import com.cloudinary.*;
 import com.cloudinary.utils.ObjectUtils;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,17 +83,16 @@ public class MediaUpload {
     }
 
 
-    private static String getVideoThumbnail(String filePath, String fileName){
-        System.out.println(filePath);
+    private static String getVideoThumbnail(String filePath, String fileName) {
+        String thumbnailFilePath = null;
         try {
-            Process metadataProcess = Runtime.getRuntime().exec("ffmpeg -i "+filePath+" -vframes 1 "+fileName+".jpg");
+            Process metadataProcess = Runtime.getRuntime().exec("ffmpeg -i " + filePath + " -vframes 1 " + fileName + ".jpg");
+
         } catch (IOException e) {
-            inputOutput.showInfo("Cant execute the thumbnail command: " + e.getMessage());
+            System.err.println("Error executing ffmpeg command: " + e.getMessage());
             e.printStackTrace();
         }
-        //thumbnailFilePath = "C:\\Users\\david\\Documents\\DAVID\\UP\\4_Semestre\\ComputerGraphics\\ProjectP2\\MavenIaMediaAnalyzer\\"+fileName+".jpg";
-        return "C:\\Users\\david\\Documents\\DAVID\\UP\\4_Semestre\\ComputerGraphics\\ProjectP2\\AiMediaAnalyze\\Media\\"+fileName+".jpg";
-
+        return filePath+".jpg";
     }
 
 
