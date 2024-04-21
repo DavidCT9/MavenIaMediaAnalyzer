@@ -18,7 +18,7 @@ public class Main {
 
     public static void main(String[] args) {
         //String folderPath = inputOutput.getString("Please provide the path of the folder with the desired media to analyze", "Not valid Path");
-//        PipelineManager.MainPipeline();
-        VideoGenerator.mapToVideo("map.png", "Hello thereeeeeeeeeee");
+        PipelineManager.MainPipeline();
+
     }
 }
