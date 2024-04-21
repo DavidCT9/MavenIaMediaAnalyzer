@@ -6,7 +6,7 @@
       "content": [
         {
           "type": "text",
-          "text": "Describe this image in a interesting and attractive way, the description text when its read need to take less than 7 seconds"
+          "text": "Describe this image in a interesting and attractive way, the description text when its read need to take less than 3 seconds"
         },
         {
           "type": "image_url",

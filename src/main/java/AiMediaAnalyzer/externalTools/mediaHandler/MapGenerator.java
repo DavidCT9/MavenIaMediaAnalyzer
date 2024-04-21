@@ -22,7 +22,7 @@ public class MapGenerator {
         String googleApiKey = System.getenv("GOOGLE_API");
         String[] commandPrompt;
 
-        commandPrompt = new String[]{"curl", "-X", "POST", "-H", "Content-Length: 0", "https://maps.googleapis.com/maps/api/staticmap?center=" + location[2] + "&zoom=1&size=400x400&markers=" + location[0] + "&markers=" + location[1] + "&key=" + googleApiKey};
+        commandPrompt = new String[]{"curl", "-X", "POST", "-H", "Content-Length: 0", "https://maps.googleapis.com/maps/api/staticmap?center=" + location[2] + "&format=png&zoom=1&size=400x400&markers=" + location[0] + "&markers=" + location[1] + "&key=" + googleApiKey};
 
         final ProcessBuilder builder = new ProcessBuilder();
         Path path = null;

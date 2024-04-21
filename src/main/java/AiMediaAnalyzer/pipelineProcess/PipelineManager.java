@@ -24,8 +24,8 @@ public class PipelineManager {
 //        String iaImgPath = ImageGenerator.generateImage(mediaArray);
 //        inputOutput.showInfo("Creating inspirational phrase...");
 //          String captions = TextGenerator.inspirtionalPhrase(mediaArray);
-//        inputOutput.showInfo("Geolocation of your media and creating the map...");
-//        String mapImgPath = MapGenerator.mapCreator(mediaArray);
+        inputOutput.showInfo("Geolocation of your media and creating the map...");
+        String mapImgPath = MapGenerator.mapCreator(mediaArray);
 //        inputOutput.showInfo("Generating voices...");
 //        VoiceGenerator.generateAudios(mediaArray);
 //        inputOutput.showInfo("Creating frames...");

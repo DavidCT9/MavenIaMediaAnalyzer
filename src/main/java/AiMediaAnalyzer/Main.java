@@ -16,8 +16,9 @@ import java.awt.*;
 
 public class Main {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         //String folderPath = inputOutput.getString("Please provide the path of the folder with the desired media to analyze", "Not valid Path");
-        PipelineManager.MainPipeline();
+//        PipelineManager.MainPipeline();
+        VideoGenerator.mapToVideo("map.png", "Hello thereeeeeeeeeee");
     }
 }

@@ -84,7 +84,7 @@ public class ImageGenerator {
     }
 
     public static String iaImgDownloader(String imageUrl) {
-        String destinationFile = "IaGeneratedImage.jpg";
+        String destinationFile = "IaGeneratedImage.png";
 
         File file = null;
         try {

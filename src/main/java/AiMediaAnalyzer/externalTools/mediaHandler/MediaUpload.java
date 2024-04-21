@@ -84,25 +84,7 @@ public class MediaUpload {
         command = new String[]{"ffmpeg", "-i", filePath, "-vf", "select='eq(n,0)'",
                 "-vframes", "1", fileName + ".jpg"};
 
-        ProcessBuilder builder = new ProcessBuilder(command);
-        builder.redirectErrorStream(true);
-
-        try {
-            Process process = builder.start();
-            InputStream is = process.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                //System.out.println(line);
-            }
-            int exitCode = process.waitFor();
-            System.out.println("Process exited with code: " + exitCode);
-            process.destroy();
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        VideoGenerator.processCommand(command);
 
         return fileName+".jpg";
     }
