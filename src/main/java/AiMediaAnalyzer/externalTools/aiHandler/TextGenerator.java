@@ -54,7 +54,7 @@ public class TextGenerator {
         String absolutePath = null;
         try {
             JsonNode jsonNode = mapper.readTree(new File("src/main/resources/jsonRequests/inspirationalPhrase.json"));
-            StringBuilder promptText = new StringBuilder("I will give you a list of image descriptions (in a json), with this ones you will create a inspirational phrase that summarizes and describe the essence of all descriptions just in one phrase MAXIMUM 75 CHARACTERS. The descriptions: ");
+            StringBuilder promptText = new StringBuilder("I will give you a list of image descriptions (in a json), with this ones you will create a inspirational phrase that summarizes and describe the essence of all descriptions just in one phrase MAXIMUM 15 CHARACTERS. The descriptions: ");
 
             for (MediaObj mediaFile : mediaObjs) {
                 promptText.append(mediaFile.getIaDescription());

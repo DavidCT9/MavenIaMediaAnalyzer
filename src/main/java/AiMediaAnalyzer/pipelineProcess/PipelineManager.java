@@ -11,10 +11,10 @@ import AiMediaAnalyzer.externalTools.mediaHandler.*;
 public class PipelineManager {
     static IOHandler inputOutput = new IOConsole();
 
-    public static void MainPipeline() {
+    public static void MainPipeline(String folderPath) {
         inputOutput.showInfo("Extracting metadata...");
         MetadataExtractor obtainMeta = new MetadataExtractor();
-        MediaObj[] mediaArray = obtainMeta.ObtainMetadata("src/main/resources/Media");
+        MediaObj[] mediaArray = obtainMeta.ObtainMetadata(folderPath);
 
         inputOutput.showInfo("Uploading files...");
         MediaUpload uploadFiles = new MediaUpload();
@@ -27,7 +27,7 @@ public class PipelineManager {
         String iaImgPath = ImageGenerator.generateImage(mediaArray);
 
         inputOutput.showInfo("Creating inspirational phrase...");
-          String captions = TextGenerator.inspirtionalPhrase(mediaArray);
+        String captions = TextGenerator.inspirtionalPhrase(mediaArray);
 
         inputOutput.showInfo("Geolocation of your media and creating the map...");
         String mapImgPath = MapGenerator.mapCreator(mediaArray);
@@ -38,11 +38,10 @@ public class PipelineManager {
         inputOutput.showInfo("Creating frames...");
         VideoGenerator.framesCreation(mediaArray);
 
+
         inputOutput.showInfo("Assembling final video!");
-        VideoObj finalVideo = new VideoObj(iaImgPath, mapImgPath, captions);
+        VideoObj finalVideo = new VideoObj(mapImgPath, iaImgPath, captions);
         VideoGenerator.finalAssembly(mediaArray, finalVideo);
-
-
 
 
     }

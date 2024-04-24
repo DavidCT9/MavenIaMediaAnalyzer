@@ -41,8 +41,6 @@ public class MetadataExtractor {
     }
 
 
-// exiftool -p "$filename has date $dateTimeOriginal" -q -f C:\Users\david\Downloads\imgAudi\
-
     public MediaObj[] ObtainMetadata(String folderPath) {
         String tempLat = "";
         String tempLon ="";
@@ -59,7 +57,6 @@ public class MetadataExtractor {
                 if (file.isFile()) {
                     try {
                         Process metadataProcess = Runtime.getRuntime().exec("exiftool -createdate -GPSLatitude -GPSLongitude \"" + file.getAbsolutePath() + "\"");
-                        System.out.println("file: " + file.getAbsolutePath());
                         String tempMediaPath = file.getAbsolutePath();
                         BufferedReader fileReader = new BufferedReader(new InputStreamReader(metadataProcess.getInputStream()));
                         String readLine;
@@ -88,7 +85,7 @@ public class MetadataExtractor {
 
                         metadataProcess.waitFor();
                         mediaArray[mediaObjCounter] = new MediaObj(tempMediaPath,tempLat, tempLon, tempDate);
-                         inputOutput.showInfo(mediaArray[mediaObjCounter].getLatitude()+" "+mediaArray[mediaObjCounter].getLongitude()+" "+mediaArray[mediaObjCounter].getDateOriginal());
+                        inputOutput.showInfo(mediaArray[mediaObjCounter].getLatitude()+" "+mediaArray[mediaObjCounter].getLongitude()+" "+mediaArray[mediaObjCounter].getDateOriginal());
                         mediaObjCounter+=1;
 
                     } catch (IOException | InterruptedException e) {

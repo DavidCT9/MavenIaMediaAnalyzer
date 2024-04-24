@@ -4,7 +4,7 @@
   "messages": [
     {
       "role": "system",
-      "content": "You are a helpful assistant designed to output just a String with the asked information, less that 30 words."
+      "content": "You are a helpful assistant designed to output just a 10 words or less String with the asked information"
     },
     {
       "role": "user",

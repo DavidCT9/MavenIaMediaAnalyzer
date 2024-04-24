@@ -8,6 +8,7 @@ import com.cloudinary.utils.ObjectUtils;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.Map;
 
 public class MediaUpload {
@@ -25,6 +26,10 @@ public class MediaUpload {
                 if (mediaFile.getUrl() != null) {
                     inputOutput.showInfo("Upload successful!");
                     inputOutput.showInfo("Public URL: " + mediaFile.getUrl());
+                    inputOutput.showInfo("Local URL: " + mediaFile.getAbsolutePath());
+                } else {
+                    inputOutput.showInfo("Upload failed! Null Url. Path: "+mediaFile.getAbsolutePath());
+                    mediaArray = deleteObj(mediaArray, mediaFile);
                 }
 
             }
@@ -86,8 +91,29 @@ public class MediaUpload {
 
         VideoGenerator.processCommand(command);
 
-        return fileName+".jpg";
+        return fileName + ".jpg";
     }
 
 
+    public static MediaObj[] deleteObj(MediaObj[] arr, MediaObj objToDelete) {
+        int indexToRemove = -1;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i].equals(objToDelete)) {
+                indexToRemove = i;
+                break;
+            }
+        }
+
+        if (indexToRemove != -1) {
+            MediaObj[] nuevoArr = new MediaObj[arr.length - 1];
+            for (int i = 0, j = 0; i < arr.length; i++) {
+                if (i != indexToRemove) {
+                    nuevoArr[j++] = arr[i];
+                }
+            }
+            return nuevoArr;
+        } else {
+            return arr;
+        }
+    }
 }

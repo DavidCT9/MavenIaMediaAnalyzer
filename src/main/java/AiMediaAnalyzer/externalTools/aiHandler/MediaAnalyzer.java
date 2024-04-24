@@ -16,7 +16,6 @@ public class MediaAnalyzer {
     public static void openAiVision(MediaObj[] mediaArray){
         for (MediaObj mediaFile: mediaArray) {
             String jsonPath = modifyImageUrl(mediaFile.getUrl(),mediaFile.getDateOriginal());
-            System.out.println(mediaFile.getUrl());
 
             String[] curlCommand;
             String openAiKey = System.getenv("OPENAI_API_KEY");

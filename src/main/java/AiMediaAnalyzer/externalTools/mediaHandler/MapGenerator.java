@@ -22,7 +22,7 @@ public class MapGenerator {
         String googleApiKey = System.getenv("GOOGLE_API");
         String[] commandPrompt;
 
-        commandPrompt = new String[]{"curl", "-X", "POST", "-H", "Content-Length: 0", "https://maps.googleapis.com/maps/api/staticmap?center=" + location[2] + "&format=png&zoom=1&size=400x400&markers=" + location[0] + "&markers=" + location[1] + "&key=" + googleApiKey};
+        commandPrompt = new String[]{"curl", "-X", "POST", "-H", "Content-Length: 0", "https://maps.googleapis.com/maps/api/staticmap?center=" + location[2] + "&format=png&zoom=6&size=400x400&markers=" + location[0] + "&markers=" + location[1] + "&key=" + googleApiKey};
 
         final ProcessBuilder builder = new ProcessBuilder();
         Path path = null;
@@ -52,18 +52,13 @@ public class MapGenerator {
 
 
     public static String[] mediaSort(MediaObj[] mediaObjs) {
-        //Sort the MediaObj array depending on the timestamp value that each one has
         Arrays.sort(mediaObjs, Comparator.comparingLong(obj -> Long.parseLong(obj.getDateOriginal())));
 
-//        for (MediaObj mediaFile : mediaObjs) {
-//            System.out.println(mediaFile.getDateOriginal());
-//        }
 
         String[] location = new String[3];
         location[0] = formatLocation(mediaObjs[0].getLatitude(), mediaObjs[0].getLongitude());
         location[1] = formatLocation(mediaObjs[mediaObjs.length-1].getLatitude(), mediaObjs[mediaObjs.length-1].getLongitude());
         location[2] = calculateMidpoint(location[0] , location[1]);
-//        System.out.println(location[2]);
 
         return location;
     }

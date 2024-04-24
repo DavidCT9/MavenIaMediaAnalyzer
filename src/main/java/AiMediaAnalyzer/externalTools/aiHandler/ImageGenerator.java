@@ -78,7 +78,7 @@ public class ImageGenerator {
 
             absolutePath = outputFile.getAbsolutePath();
         } catch (Exception e) {
-            System.out.println("Error");
+            System.out.println("Error modifying json: " + e.getMessage());
         }
         return absolutePath;
     }

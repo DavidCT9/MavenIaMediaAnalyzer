@@ -2,6 +2,7 @@ package AiMediaAnalyzer.externalTools.mediaHandler;
 
 import AiMediaAnalyzer.IOtools.IOConsole;
 import AiMediaAnalyzer.IOtools.IOHandler;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -17,32 +18,29 @@ public class VideoGenerator {
 
     public static void framesCreation(MediaObj[] mediaObjs) {
         for (MediaObj mediaObj : mediaObjs) {
-
             try {
-                Path file = Paths.get(mediaObj.getAbsolutePath());
-                String fileType = Files.probeContentType(file);
-                if (fileType != null) {
-                    if (fileType.startsWith("image/")) {
-                        imgToVideo(mediaObj);
-                    } else if (fileType.startsWith("video/")) {
-                        System.out.println("Video detected");
-                        videoToVideo(mediaObj);
+                if (mediaObj != null && mediaObj.getAbsolutePath() != null) {
+                    Path file = Paths.get(mediaObj.getAbsolutePath());
+                    String fileType = Files.probeContentType(file);
+                    if (fileType != null) {
+                        if (fileType.startsWith("image/")) {
+                            imgToVideo(mediaObj);
+                        } else if (fileType.startsWith("video/")) {
+                            videoToVideo(mediaObj);
+                        } else {
+                            System.err.println("Unsupported file type: " + fileType);
+                        }
                     } else {
-                        System.err.println("Unsupported file type: " + fileType);
-
+                        System.err.println("Failed to determine file type for: " + mediaObj.getAbsolutePath());
                     }
                 } else {
-                    System.err.println("Failed to determine file type for: " + mediaObj.getAbsolutePath());
-
+                    System.err.println("Media object or its absolute path is null");
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.err.println("Error determining file type: " + e.getMessage());
-
             }
-
         }
     }
-
 
     private static void imgToVideo(MediaObj mediaObj) {
         String imageInputPath = mediaObj.getAbsolutePath();
@@ -54,30 +52,35 @@ public class VideoGenerator {
             Process ffprobeProcess = ffprobeBuilder.start();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(ffprobeProcess.getInputStream()))) {
                 String durationStr = reader.readLine();
-                double duration = Double.parseDouble(durationStr);
+                if (durationStr != null) {
+                    double duration = Double.parseDouble(durationStr.trim());
 
-                String[] command = new String[]{"ffmpeg", "-loop", "1", "-i", imageInputPath, "-i", audioInputPath,
-                        "-c:v", "libx264", "-c:a", "aac",
-                        "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2",
-                        "-shortest", "-t", String.valueOf(duration), outputVideo};
-                ProcessBuilder builder = new ProcessBuilder(command);
-                builder.redirectErrorStream(true);
-                Process process = builder.start();
-                try (InputStream is = process.getInputStream();
-                     InputStreamReader isr = new InputStreamReader(is);
-                     BufferedReader br = new BufferedReader(isr)) {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        //System.out.println(line);
+                    String[] command = new String[]{"ffmpeg", "-loop", "1", "-i", imageInputPath, "-i", audioInputPath,
+                            "-c:v", "libx264", "-c:a", "aac",
+                            "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1",
+                            "-pix_fmt", "yuv420p",
+                            "-shortest", "-t", String.valueOf(duration), outputVideo};
+                    ProcessBuilder builder = new ProcessBuilder(command);
+                    builder.redirectErrorStream(true);
+                    Process process = builder.start();
+                    try (InputStream is = process.getInputStream();
+                         InputStreamReader isr = new InputStreamReader(is);
+                         BufferedReader br = new BufferedReader(isr)) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            //System.out.println(line);
+                        }
                     }
+                    int exitCode = process.waitFor();
+                    System.out.println("Process exited with code: " + exitCode);
+
+                    mediaObj.setGeneratedVideoPath(outputVideo);
+                } else {
+                    System.err.println("Duration string is null.");
                 }
-                int exitCode = process.waitFor();
-                System.out.println("Process exited with code: " + exitCode);
-
-                mediaObj.setGeneratedVideoPath(outputVideo);
-
             }
         } catch (IOException | InterruptedException e) {
+            inputOutput.showInfo("image to video failed in: "+mediaObj.getAbsolutePath());
             throw new RuntimeException(e);
         }
     }
@@ -92,12 +95,12 @@ public class VideoGenerator {
             Process ffprobeProcess = ffprobeBuilder.start();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(ffprobeProcess.getInputStream()))) {
                 String durationStr = reader.readLine();
-                double duration = Double.parseDouble(durationStr);
+                //double duration = Double.parseDouble(durationStr);
 
                 String[] command = new String[]{"ffmpeg", "-i", imageInputPath, "-i", audioInputPath,
-                        "-c:v", "copy", "-c:a", "aac", "-map", "0:v:0", "-map",
-                        "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2",
-                        "1:a:0", outputVideo};
+                        "-c:v", "libx264", "-c:a", "aac", "-map", "0:v:0", "-map", "1:a:0",
+                        "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1",
+                        outputVideo};
                 ProcessBuilder builder = new ProcessBuilder(command);
                 builder.redirectErrorStream(true);
                 Process process = builder.start();
@@ -118,6 +121,8 @@ public class VideoGenerator {
                         }
                     }
                 }
+
+                mediaObj.setGeneratedVideoPath(outputVideo);
                 System.out.println("Process exited with code: " + exitCode);
             }
         } catch (IOException | InterruptedException e) {
@@ -126,57 +131,60 @@ public class VideoGenerator {
     }
 
     public static void finalAssembly(MediaObj[] mediaObjs, VideoObj video) {
-
-        List<String> videoPaths = new ArrayList<String>();
         String mapVideoPath = mapToVideo(video.getMapImagePath(), video.getCaptions());
         String iaVideoPath = iaImgToVideo(video.getIaImagePath());
 
-        videoPaths.add(mapVideoPath);
+        List<String> inputPaths = new ArrayList<>();
+
+        inputPaths.add("-i");
+        inputPaths.add(iaVideoPath);
+
         for (MediaObj mediaObj : mediaObjs) {
-            videoPaths.add(mediaObj.getGeneratedVideoPath());
-        }
-        videoPaths.add(iaVideoPath);
-
-        String txtPath = createInputTxtFile(videoPaths);
-        if (txtPath != null) {
-            String[] command = {
-                    "ffmpeg",
-                    "-f", "concat",
-                    "-safe", "0",
-                    "-i", txtPath,
-                    "-c:v", "libx264",
-                    "-c:a", "aac",
-                    "-vf", "format=yuv420p",
-                    "output.mp4"
-            };
-
-            processCommand(command);
-        }else{
-            inputOutput.showInfo("Input text cant be created");
+            inputPaths.add("-i");
+            inputPaths.add(mediaObj.getGeneratedVideoPath());
         }
 
+        inputPaths.add("-i");
+        inputPaths.add(mapVideoPath);
+
+        String[] command = {
+                "ffmpeg"
+        };
+
+        command = ArrayUtils.addAll(command, inputPaths.toArray(new String[0]));
+
+        StringBuilder filterComplex = new StringBuilder();
+        filterComplex.append("[0:v] [0:a] ");
+        for (int i = 1; i <= mediaObjs.length; i++) {
+            filterComplex.append("[").append(i).append(":v] [").append(i).append(":a] ");
+        }
+        filterComplex.append("[").append(mediaObjs.length + 1).append(":v] [").append(mediaObjs.length + 1).append(":a] ");
+        filterComplex.append("concat=n=").append(mediaObjs.length + 2).append(":v=1:a=1 [vv] [aa]");
+
+        command = ArrayUtils.addAll(command, "-filter_complex", filterComplex.toString());
+        command = ArrayUtils.addAll(command, "-map", "[vv]", "-map", "[aa]");
+        String[] outputCommand = {
+                "-c:v", "libx264",
+                "FinalVideo.mp4"
+        };
+        command = ArrayUtils.addAll(command, outputCommand);
+
+        System.out.println(Arrays.toString(command));
+        processCommand(command);
     }
-
-
-    public static String createInputTxtFile(List<String> videoPaths) {
-        String filePath = "finalAssembly.txt";
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (String videoPath : videoPaths) {
-                writer.write("file '" + videoPath + "'\n");
-            }
-            return filePath;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 
     public static String mapToVideo(String mapPath, String captions) {
+
+        if (captions.startsWith("\n")) {
+            captions = captions.substring(1);
+        }
+        captions = captions.replace("\n","");
+        captions = captions.replaceAll("^.*\"[^\"]*\"([^\"]*)\"[^\"\"]*$", "$1");
+
         String assSubtitleFilePath = "temp_subtitle.srt";
         writeCaptionsToFile(captions, assSubtitleFilePath);
         String outputFile = "mapVideo.mp4";
+        System.out.println("CAPTIONS: "+captions);
 
         String[] command = {
                 "ffmpeg",
@@ -186,7 +194,7 @@ public class VideoGenerator {
                 "-i", "anullsrc",
                 "-c:v", "libx264",
                 "-t", "3",
-                "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,subtitles=" + assSubtitleFilePath,
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,subtitles=" + assSubtitleFilePath+",setsar=1",
                 "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
                 "-shortest",
@@ -217,7 +225,7 @@ public class VideoGenerator {
                 "-i", "anullsrc",
                 "-c:v", "libx264",
                 "-t", "3",
-                "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2",
+                "-vf", "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2,setsar=1",
                 "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
                 "-shortest",
@@ -226,7 +234,6 @@ public class VideoGenerator {
         processCommand(command);
         return outputFile;
     }
-
 
     static void processCommand(String[] command) {
         ProcessBuilder builder = new ProcessBuilder(command);
@@ -240,9 +247,8 @@ public class VideoGenerator {
 
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
+                //System.out.println(line);
             }
-//            System.out.println(process.getOutputStream());
 
             int exitCode = process.waitFor();
             System.out.println("Process exited with code: " + exitCode);

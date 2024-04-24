@@ -1,14 +1,18 @@
 package AiMediaAnalyzer.externalTools.aiHandler;
 
+import AiMediaAnalyzer.IOtools.IOConsole;
+import AiMediaAnalyzer.IOtools.IOHandler;
 import AiMediaAnalyzer.externalTools.mediaHandler.MediaObj;
 import org.cloudinary.json.JSONObject;
 
 import java.io.*;
 
 public class VoiceGenerator {
+    static IOHandler inputOutput = new IOConsole();
 
     public static void generateAudios(MediaObj[] mediaObjs) {
         String openAiKey = System.getenv("OPENAI_API_KEY");
+        inputOutput.showInfo("Media length: "+mediaObjs.length);
 
         for (MediaObj mediaObj : mediaObjs) {
 
@@ -28,6 +32,7 @@ public class VoiceGenerator {
                 try (OutputStream outputStream = new FileOutputStream("output.mp3")) {
                     outputStream.write(audioBytes);
                 } catch (IOException e) {
+                    inputOutput.showInfo("Could not generate audio for: "+audioName);
                     e.printStackTrace();
                 }
 
@@ -40,7 +45,6 @@ public class VoiceGenerator {
 
         }
     }
-
 
     private static String jsonModifier(MediaObj mediaObj) {
         String jsonFilePath = "src/main/resources/jsonRequests/tts.json";
