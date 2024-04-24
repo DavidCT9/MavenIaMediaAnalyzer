@@ -14,6 +14,12 @@ import java.util.Date;
 public class TextGenerator {
     static IOHandler inputOutput = new IOConsole();
 
+    /**
+     * Executes the API call to create just one description or phrase that
+     * summarizes all the descriptions of all the media.
+     * @return A string that contains the phrase.
+     * @author David
+     */
     public static String inspirtionalPhrase(MediaObj[] mediaObjs) {
         String[] commandPrompt;
         String openAiKey = System.getenv("OPENAI_API_KEY");
@@ -46,7 +52,12 @@ public class TextGenerator {
         return inspirationalPhrase;
     }
 
-
+    /**
+     * Access the json template tree to modify the value, appending all
+     * descriptions of the media array and saving it
+     * @return The path of the modified json.
+     * @author David
+     */
     public static String jsonModifier(MediaObj[] mediaObjs) {
 
         ObjectMapper mapper = new ObjectMapper();

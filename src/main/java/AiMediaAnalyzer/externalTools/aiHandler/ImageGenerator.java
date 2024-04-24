@@ -15,6 +15,13 @@ import java.util.Date;
 public class ImageGenerator {
     static IOHandler inputOutput = new IOConsole();
 
+    /**
+     * Is the main method of the class, receiving a json that will be used in the
+     * cURL prompt to generate the image.Receives the byte array response from
+     * OPEN AI api and then write the file with those bytes to create the AI image
+     * @return The AI image generated path.
+     * @author David
+     */
     public static String generateImage(MediaObj[] mediaArray) {
         String jsonString = jsonModifier(mediaArray);
 
@@ -48,6 +55,13 @@ public class ImageGenerator {
         return IaImgAbsolutePath;
     }
 
+    /**
+     * Create a json with all the media descriptions compiled, so then lately
+     * can be sent.The method iterates all the media array to obtain the descriptions
+     * and enter to the json "tree" structure to modify the prompt value
+     * @return The modified json path.
+     * @author David
+     */
     public static String jsonModifier(MediaObj[] mediaArray) {
         ObjectMapper mapper = new ObjectMapper();
         String absolutePath = null;
@@ -83,6 +97,12 @@ public class ImageGenerator {
         return absolutePath;
     }
 
+    /**
+     * This method does the "hard work" of receiving the bytes and directly
+     * writing them in a new file and saving it as a png, so later can be used
+     * @return The AI image path.
+     * @author David
+     */
     public static String iaImgDownloader(String imageUrl) {
         String destinationFile = "IaGeneratedImage.png";
 

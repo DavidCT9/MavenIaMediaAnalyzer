@@ -14,6 +14,11 @@ import java.util.Map;
 public class MediaUpload {
     static IOHandler inputOutput = new IOConsole();
 
+    /**
+     * Cycle the media objects array just to upload the
+     * media and handle upload errors
+     * @author David
+     */
     public void cloudinaryHandler(MediaObj[] mediaArray) {
 
         try {
@@ -40,6 +45,12 @@ public class MediaUpload {
 
     }
 
+    /**
+     * Classifies the media object if it is a video or image and call
+     * the method according to the file, handle file mismatch
+     * @return The public url of the media object.
+     * @author David
+     */
     public static String cloudinaryUpload(String filePath, String publicId) {
         Cloudinary cloudinary = CloudinarySingleton.getCloudinary();
         String publicUrl = null;
@@ -83,7 +94,11 @@ public class MediaUpload {
         return publicUrl;
     }
 
-
+    /**
+     * Execute an easy ffmpeg command to extract the thumbnail of a video
+     * @return The path of the thumbnail.
+     * @author David
+     */
     private static String getVideoThumbnail(String filePath, String fileName) {
         String[] command;
         command = new String[]{"ffmpeg", "-i", filePath, "-vf", "select='eq(n,0)'",
@@ -95,6 +110,12 @@ public class MediaUpload {
     }
 
 
+    /**
+     * When the object for some file type issue returns url null
+     * this method is called to delete the object and upload the array
+     * @return new or the same media array.
+     * @author David
+     */
     public static MediaObj[] deleteObj(MediaObj[] arr, MediaObj objToDelete) {
         int indexToRemove = -1;
         for (int i = 0; i < arr.length; i++) {

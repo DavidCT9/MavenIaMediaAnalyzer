@@ -40,7 +40,12 @@ public class MetadataExtractor {
         this.mediaFiles = mediaFiles;
     }
 
-
+    /**
+     * Use ffmpeg to ask for the required metadata
+     * and save it in the mediaObj properties
+     * @return the initial Media Object Array.
+     * @author David
+     */
     public MediaObj[] ObtainMetadata(String folderPath) {
         String tempLat = "";
         String tempLon ="";

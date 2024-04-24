@@ -2,10 +2,7 @@ package AiMediaAnalyzer.externalTools.mediaHandler;
 
 import AiMediaAnalyzer.IOtools.IOConsole;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +12,13 @@ import java.util.Comparator;
 public class MapGenerator {
     static IOConsole inputOutput = new IOConsole();
 
-
+    /**
+     * Cals all of its "assistant methods" and according to the array of locations
+     * executes the GOOGLE STATIC MAP API call to request an image with a pin in the
+     * first and last location of the array.
+     * @return The path of the generated map.
+     * @author David
+     */
     public static String mapCreator(MediaObj[] mediaObjs) {
         String[] location = mediaSort(mediaObjs);
 
@@ -51,6 +54,13 @@ public class MapGenerator {
     }
 
 
+    /**
+     * Sort the media array according to its date created, so we can get
+     * the oldest and newest file, also is obtained the middle point between
+     * those locations.
+     * @return A string array that contains the newest file, oldest and the midpoint location.
+     * @author David
+     */
     public static String[] mediaSort(MediaObj[] mediaObjs) {
         Arrays.sort(mediaObjs, Comparator.comparingLong(obj -> Long.parseLong(obj.getDateOriginal())));
 
@@ -63,7 +73,12 @@ public class MapGenerator {
         return location;
     }
 
-
+    /**
+     * Remove extra spaces of the original latitude and longitude values
+     * and format its so can be used as doubles
+     * @return A separated comma string containing the latitude and longitude formated.
+     * @author David
+     */
     public static String formatLocation(String latitude, String longitude) {
         String[] coordinatesLat = latitude.split(" ");
         String[] coordinatesLon = longitude.split(" ");
@@ -77,6 +92,14 @@ public class MapGenerator {
         return String.format("%.6f,%.6f", doubleLatitude, doubleLongitude);
     }
 
+    /**
+     * This method does the "dirty job" replacing ' and "" of minutes and seconds
+     * values of the latitude and longitude; also calculates the location as a double.
+     * Important to mention that also detects if the double needs to be negative
+     * or positive, according to its polar values ("W" or "S").
+     * @return The public url of the media object.
+     * @author David
+     */
     private static double parseCoordinate(String coordinateString) {
         String[] parts = coordinateString.split(" ");
         double degrees = Double.parseDouble(parts[0]);
@@ -92,6 +115,13 @@ public class MapGenerator {
         return decimalDegrees * directionMultiplier;
     }
 
+    /**
+     * Makes the basic math to calculate the mid-point between two points
+     * and parse them as doubles with precision of six decimals.
+     * Finally, returned as a string
+     * @return The public url of the media object.
+     * @author David
+     */
     public static String calculateMidpoint(String location1, String location2) {
         String[] parts1 = location1.split(",");
         String[] parts2 = location2.split(",");

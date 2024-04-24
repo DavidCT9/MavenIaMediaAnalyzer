@@ -16,6 +16,12 @@ import java.util.List;
 public class VideoGenerator {
     static IOHandler inputOutput = new IOConsole();
 
+    /**
+     * Iterates along the media array to classify each media file and call
+     * the appropriate method so the video can be created, also intercepts possible
+     * errors with corrupted or not accepted files
+     * @author David
+     */
     public static void framesCreation(MediaObj[] mediaObjs) {
         for (MediaObj mediaObj : mediaObjs) {
             try {
@@ -42,6 +48,13 @@ public class VideoGenerator {
         }
     }
 
+
+    /**
+     * This method is in charge of building the necessary ffmpeg command
+     * to apply the filter aspect ratio, add the mp3 file and set the duration
+     * of the video created from the input image.
+     * @author David
+     */
     private static void imgToVideo(MediaObj mediaObj) {
         String imageInputPath = mediaObj.getAbsolutePath();
         String audioInputPath = mediaObj.getAudioPath();
@@ -85,6 +98,13 @@ public class VideoGenerator {
         }
     }
 
+
+    /**
+     * This method is in charge of building the necessary ffmpeg command
+     * to apply the filter aspect ratio, add the mp3 file and create
+     * the new video based on the media object file.
+     * @author David
+     */
     private static void videoToVideo(MediaObj mediaObj) {
         String imageInputPath = mediaObj.getAbsolutePath();
         String audioInputPath = mediaObj.getAudioPath();
@@ -130,6 +150,13 @@ public class VideoGenerator {
         }
     }
 
+
+    /**
+     * This is the "golden broach" of the program, it gets all the processed videos
+     * created earlier and concatenate all of them in a ffmpeg command
+     * to finally get the output video of the program.
+     * @author David
+     */
     public static void finalAssembly(MediaObj[] mediaObjs, VideoObj video) {
         String mapVideoPath = mapToVideo(video.getMapImagePath(), video.getCaptions());
         String iaVideoPath = iaImgToVideo(video.getIaImagePath());
@@ -173,6 +200,14 @@ public class VideoGenerator {
         processCommand(command);
     }
 
+
+    /**
+     * Add the subtitles or captions to the map video because is
+     * the last image and build the video like the image to video method.
+     * Also format the captions before sending it to the write captions method.
+     * @return The path of the map video.
+     * @author David
+     */
     public static String mapToVideo(String mapPath, String captions) {
 
         if (captions.startsWith("\n")) {
@@ -206,6 +241,12 @@ public class VideoGenerator {
         return outputFile;
     }
 
+
+    /**
+     * Creates the file (that will be a srt type file) that be used in the map video
+     * process, writing the captions into a new file.
+     * @author David
+     */
     private static void writeCaptionsToFile(String captions, String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8), 8192)) {
             writer.write("1\n00:00:00,000 --> 00:00:03,000\n" + captions + "\n");
@@ -214,6 +255,13 @@ public class VideoGenerator {
         }
     }
 
+
+    /**
+     * very similar to the img to video method only that this is designed specially for
+     * the AI image and create the first video of the final video
+     * @return The path of the AI generated image video.
+     * @author David
+     */
     public static String iaImgToVideo(String iaImgPath) {
         String outputFile = "iaImgToVideo.mp4";
 
@@ -235,6 +283,12 @@ public class VideoGenerator {
         return outputFile;
     }
 
+
+    /**
+     * Receives a string array that will be processed to create a new command
+     * and execute it, cathcing possible errors of the execution.
+     * @author David
+     */
     static void processCommand(String[] command) {
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.redirectErrorStream(true);

@@ -13,6 +13,11 @@ import java.io.*;
 public class MediaAnalyzer {
     IOHandler inputOutput = new IOConsole();
 
+    /**
+     * Make the Open Ai api call using a json to receive the description of
+     * every media object in the array and save the description
+     * @author David
+     */
     public static void openAiVision(MediaObj[] mediaArray){
         for (MediaObj mediaFile: mediaArray) {
             String jsonPath = modifyImageUrl(mediaFile.getUrl(),mediaFile.getDateOriginal());
@@ -48,7 +53,12 @@ public class MediaAnalyzer {
         }
     }
 
-
+    /**
+     * Creates a copy of the sample "analyzer.json" and modofifies the url
+     * value to change it to the media object url
+     * @return The path of the modified json.
+     * @author David
+     */
     public static String modifyImageUrl(String newImageUrl, String outputFilePath) {
         ObjectMapper mapper = new ObjectMapper();
 

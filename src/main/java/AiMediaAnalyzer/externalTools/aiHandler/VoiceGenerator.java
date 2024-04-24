@@ -10,6 +10,12 @@ import java.io.*;
 public class VoiceGenerator {
     static IOHandler inputOutput = new IOConsole();
 
+    /**
+     * The chunk of code makes the API call of a text to speech.Receiving a json that
+     * essential have the descriptions of a media object, so it can be converted
+     * to a mp3 file that later will be used to build the video
+     * @author David
+     */
     public static void generateAudios(MediaObj[] mediaObjs) {
         String openAiKey = System.getenv("OPENAI_API_KEY");
         inputOutput.showInfo("Media length: "+mediaObjs.length);
@@ -46,6 +52,12 @@ public class VoiceGenerator {
         }
     }
 
+    /**
+     * Takes the template tts json template and accessing to the json
+     * replace it to a json that contain the description of the media object
+     * @return The modified json path.
+     * @author David
+     */
     private static String jsonModifier(MediaObj mediaObj) {
         String jsonFilePath = "src/main/resources/jsonRequests/tts.json";
         try {
